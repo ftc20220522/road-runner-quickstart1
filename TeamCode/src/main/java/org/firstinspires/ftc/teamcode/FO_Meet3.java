@@ -268,7 +268,7 @@ public class FO_Meet3 extends OpMode {
         switch (armState) {
             case Bottom:
                 if (gamepad2.left_bumper) {
-                    if (motorSlideRight.getCurrentPosition() < 450) {
+                    if (motorSlideRight.getCurrentPosition() < 700) {
                         servoHOT.setPosition(0.67);
                         hState = HookState.In;
                         motorSlideRight.setTargetPosition(1000);
@@ -423,18 +423,23 @@ public class FO_Meet3 extends OpMode {
             if (gamepad2.x) {
                 speed=4000;
                 position = 1000;
+                armState = ArmState.RotateUp;
             }
             if (gamepad2.y) {
                 speed=4000;
                 position = 1750;
+                armState = ArmState.RotateUp;
+
             }
             if (gamepad2.b) {
                 speed=4000;
                 position = 2250;
+                armState = ArmState.RotateUp;
             }
             if (gamepad2.a) {
                 speed=4000;
                 position = 55;
+                armState = ArmState.RotateUp;
             }
 
             if (gamepad2.left_stick_y != 0) {
