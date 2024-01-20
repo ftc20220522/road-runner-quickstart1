@@ -1,18 +1,19 @@
 package org.firstinspires.ftc.teamcode;
 import com.acmerobotics.roadrunner.*;
+import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.hardware.dfrobot.HuskyLens;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.internal.system.Deadline;
 
+import java.lang.Math;
 import java.util.concurrent.TimeUnit;
-
+@Autonomous(name="AutoMeet3")
 public class AutoTournament extends LinearOpMode {
     private final int READ_PERIOD = 2;
     private HuskyLens huskyLens;
@@ -44,8 +45,12 @@ public class AutoTournament extends LinearOpMode {
         huskyLens = hardwareMap.get(HuskyLens.class, "huskylens");
 
         //Middle Movement
-        TrajectoryActionBuilder startM = drive.actionBuilder(startPose);
-        startM.strafeTo(new Vector2d(3.0,4.0));
+        TrajectoryActionBuilder builder = drive.actionBuilder(startPose);
+
+        builder
+            .strafeTo(new Vector2d(3.0,4.0))
+            .build();
+        
 
 
 
@@ -212,7 +217,7 @@ public class AutoTournament extends LinearOpMode {
 
 
         if (location == 2) {
-            drive.actionBuilder()
+            Actions.runBlocking(builder);
 //            motorIntake.setPower(-0.45);
 //            drive.followTrajectorySequence(backM);
 //            motorIntake.setPower(0);
