@@ -62,14 +62,14 @@ public final class MecanumDrive {
                 RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
 
         // drive model parameters
-        public double inPerTick = 0.0029526106;
-        public double lateralInPerTick = inPerTick;
-        public double trackWidthTicks = 0;
+        public double inPerTick = 0.0029354207;
+        public double lateralInPerTick = 0.0020026757011671363;
+        public double trackWidthTicks = 4848.215867439751;
 
         // feedforward parameters (in tick units)
-        public double kS = 1.565806493282996;
-        public double kV = 0.0004950474243816357;
-        public double kA = 0;
+        public double kS = 1.3763267638471502;
+        public double kV =  0.0004681083902564442;
+        public double kA = 0.000075;
 
         // path profile parameters (in inches)
         public double maxWheelVel = 50;
@@ -81,9 +81,9 @@ public final class MecanumDrive {
         public double maxAngAccel = Math.PI;
 
         // path controller gains
-        public double axialGain = 0.0;
-        public double lateralGain = 0.0;
-        public double headingGain = 0.0; // shared with turn
+        public double axialGain = 6;
+        public double lateralGain = 5;
+        public double headingGain = 8; // shared with turn
 
         public double axialVelGain = 0.0;
         public double lateralVelGain = 0.0;
@@ -459,7 +459,7 @@ public final class MecanumDrive {
         c.strokePolyline(xPoints, yPoints);
     }
 
-    private static void drawRobot(Canvas c, Pose2d t) {
+    public static void drawRobot(Canvas c, Pose2d t) {
         final double ROBOT_RADIUS = 9;
 
         c.setStrokeWidth(1);
