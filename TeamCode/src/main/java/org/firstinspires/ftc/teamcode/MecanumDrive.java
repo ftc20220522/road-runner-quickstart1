@@ -52,9 +52,6 @@ import java.util.List;
 
 @Config
 public final class MecanumDrive {
-    public void setPoseEstimate(Pose2d startPose) {
-    }
-
     public static class Params {
         // IMU orientation
         // TODO: fill in these values based on
@@ -66,13 +63,13 @@ public final class MecanumDrive {
 
         // drive model parameters
         public double inPerTick = 0.0029526106;
-        public double lateralInPerTick = 0.0018440285857637862;
-        public double trackWidthTicks = 4779.210936304908;
+        public double lateralInPerTick = inPerTick;
+        public double trackWidthTicks = 0;
 
         // feedforward parameters (in tick units)
         public double kS = 1.565806493282996;
         public double kV = 0.0004950474243816357;
-        public double kA = 0.00001;
+        public double kA = 0;
 
         // path profile parameters (in inches)
         public double maxWheelVel = 50;
