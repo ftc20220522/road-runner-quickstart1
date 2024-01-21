@@ -15,7 +15,7 @@
         import java.lang.Math;
         import java.util.concurrent.TimeUnit;
 
-@Autonomous(name="AutoMeet3")
+@Autonomous(name="AutoTournament")
 public class AutoTournament extends LinearOpMode {
     private final int READ_PERIOD = 2;
     private HuskyLens huskyLens;
@@ -26,20 +26,20 @@ public class AutoTournament extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        Pose2d startPose = new Pose2d(0, 0, 0);
+        Pose2d startPose = new Pose2d(0, 0, 180);
         MecanumDrive drive = new MecanumDrive(hardwareMap, startPose);
         DcMotor motorBackRight = hardwareMap.dcMotor.get("motor8");
         DcMotor motorFrontRight = hardwareMap.dcMotor.get("motor7");
         DcMotor motorBackLeft = hardwareMap.dcMotor.get("motor2");
         DcMotor motorFrontLeft = hardwareMap.dcMotor.get("motor3");
-        DcMotor motorIntake = hardwareMap.dcMotor.get("motor4");
+        DcMotor motorIntake = hardwareMap.dcMotor.get("motor5");
         DcMotorEx motorSlideLeft = hardwareMap.get(DcMotorEx.class, "motor1");
         motorSlideLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         DcMotorEx motorSlideRight = hardwareMap.get(DcMotorEx.class, "motor6");
         motorSlideRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         motorSlideRight.setDirection(DcMotorSimple.Direction.REVERSE);
-        DcMotor temp = hardwareMap.dcMotor.get("motor7");
-        Servo servoLauncher = hardwareMap.servo.get("servo1");
+        DcMotor motorLauncher = hardwareMap.dcMotor.get("motor4");
+        Servo servoClamp = hardwareMap.servo.get("servo1");
         Servo servoHOT = hardwareMap.servo.get("servo5"); //Hook ot
         Servo servoFOT = hardwareMap.servo.get("servo4"); // flap ot
         Servo servoTOT = hardwareMap.servo.get("servo2"); // top ot
@@ -47,90 +47,63 @@ public class AutoTournament extends LinearOpMode {
         huskyLens = hardwareMap.get(HuskyLens.class, "huskylens");
 
         //Middle Movement
-        TrajectoryActionBuilder startM = drive.actionBuilder(startPose);
-        startM.strafeTo(new Vector2d(3.0,4.0));
-        TrajectoryActionBuilder builder = drive.actionBuilder(startPose);
+        Action startM =
+                drive.actionBuilder(startPose)
+                        .strafeTo(new Vector2d(25,28))
+                        .build();
+        startPose = new Pose2d(25, 28, 180);
+        Action toBoardM =
+                drive.actionBuilder(startPose)
+                        .strafeTo(new Vector2d(10,2))
+//                        .lineToY(7)
+//                        .lineToX(20)
+//                        .turnTo(90)
+//                        .lineToY(-2)
+                        .build();
 
-        builder
-                .strafeTo(new Vector2d(3.0,4.0))
-                .build();
+
+        //Right Movement
+        Action startR =
+                drive.actionBuilder(startPose)
+                        .lineToX(10)
+                        .lineToY(10)
+                        .build();
+        Action toBoardR =
+                drive.actionBuilder(startPose)
+                        .lineToY(7)
+                        .lineToX(20)
+                        .turnTo(90)
+                        .lineToY(2)
+                        .build();
 
 
+        //Left Movement
+        Action startL =
+                drive.actionBuilder(startPose)
+                        .strafeTo(new Vector2d(26,22))
+                        .build();
+        startPose = new Pose2d(15, 5, 180);
+        Action toBoardL =
+                drive.actionBuilder(startPose)
+                        .lineToY(5)
+                        .lineToX(20)
+                        .turnTo(90)
+                        .lineToY(-2)
+                        .build();
 
 
-//       TrajectorySequence startM = drive.FollowTrajectoryAction(startPose)
-//                .back(29)
-//                .build();
-//        TrajectorySequence backM = drive.trajectorySequenceBuilder(startM.end())
-//                .forward(5)
-//                //Clockwise is positive (right)
-//                //Counterclockwise is negative (left)
-//                .build();
-//        TrajectorySequence moveM = drive.trajectorySequenceBuilder(backM.end())
-//                .forward(3)
-//                .strafeLeft(18)
-//                .back(33)
-//                .turn(Math.toRadians(-90))
-//                .forward(106)
-//                .build();
-//        TrajectorySequence leftM = drive.trajectorySequenceBuilder(moveM.end())
-//                .strafeLeft(28)
-//                .forward(3)
-//                .build();
-//        TrajectorySequence backwardM = drive.trajectorySequenceBuilder(leftM.end())
-//                .back(8)
-//                .strafeRight(15)
-//                .build();
-//
-//
-//        //Right Movement
-//        TrajectorySequence startR = drive.trajectorySequenceBuilder(startPose)
-//                .back(26)
-//                .strafeLeft(11)
-//                .build();
-//        TrajectorySequence backR = drive.trajectorySequenceBuilder(startR.end())
-//                .forward(10)
-//                .build();
-//        TrajectorySequence moveR = drive.trajectorySequenceBuilder(backR.end())
-//                .strafeRight(16)
-//                .back(38)
-//                .turn(Math.toRadians(-90))
-//                .forward(83)
-//                .build();
-//        TrajectorySequence leftR = drive.trajectorySequenceBuilder(moveR.end())
-//                .strafeLeft(25)
-//                .forward(3)
-//                .build();
-//        TrajectorySequence backwardR = drive.trajectorySequenceBuilder(leftR.end())
-//                .back(8)
-//                .strafeRight(15)
-//                .build();
-//
-//
-//        //Left Movement
-//        TrajectorySequence startL = drive.trajectorySequenceBuilder(startPose)
-//                .back(28.5)
-//                //Positive turns counterclockwise
-//                .turn(Math.toRadians(90))
-//                .back(10)
-//                .build();
-//        TrajectorySequence backL = drive.trajectorySequenceBuilder(startL.end())
-//                .forward(9)
-//                .build();
-//        TrajectorySequence moveL = drive.trajectorySequenceBuilder(backL.end())
-//                .strafeLeft(28)
-//                .turn(Math.toRadians(-180))
-//                .forward(87)
-//                .build();
-//        TrajectorySequence leftL = drive.trajectorySequenceBuilder(moveL.end())
-//                .strafeLeft(40)
-//                .forward(3)
-//                .build();
-//        TrajectorySequence backwardL = drive.trajectorySequenceBuilder(leftL.end())
-//                .back(8)
-//                .strafeRight(15)
-//                .build();
-
+        //Common Movement
+        Action move =
+                drive.actionBuilder(startPose)
+                        .lineToX(10)
+                        .waitSeconds(0.5)
+                        .lineToY(2)
+                        .build();
+        Action park =
+                drive.actionBuilder(startPose)
+                        .lineToY(2)
+                        .lineToX(15)
+                        .build();
 
 
         /*
@@ -176,12 +149,12 @@ public class AutoTournament extends LinearOpMode {
 
 
         waitForStart();
-        servoLauncher.setPosition(0.2);
+        servoClamp.setPosition(0.6);
         motorSlideLeft.setTargetPosition(0);
         motorSlideRight.setTargetPosition(0);
         servoTOT.setPosition(0.83);
         servoBOT.setPosition(0.23);
-        servoFOT.setPosition(0.1);
+        servoFOT.setPosition(0.08);
         servoHOT.setPosition(0.67);
         long start = System.currentTimeMillis();
         long end = start + 2000;
@@ -221,13 +194,12 @@ public class AutoTournament extends LinearOpMode {
 
 
         if (location == 2) {
-            Actions.runBlocking(builder);
-//            motorIntake.setPower(-0.45);
-//            drive.followTrajectorySequence(backM);
-//            motorIntake.setPower(0);
-//            drive.followTrajectorySequence(moveM);
+            Actions.runBlocking(startM);
+            servoClamp.setPosition(0.15);
+            sleep(20000);
+//            Actions.runBlocking(toBoardM);
 
-            //END PART DO NOT CHANGE
+            //Viper Slides Up
 //            motorSlideRight.setTargetPosition(1000);
 //            motorSlideLeft.setTargetPosition(1000);
 //            motorSlideRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -244,12 +216,16 @@ public class AutoTournament extends LinearOpMode {
 //            motorSlideLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 //            motorSlideRight.setVelocity(1000);
 //            motorSlideLeft.setVelocity(1000);
+
+            //Yellow Pixel Drop Sequence
 //            sleep(3400);
-//            drive.followTrajectorySequence(leftM);
+//            drive.followTrajectorySequence(move);
 //            sleep(300);
-//            servoFOT.setPosition(0.72);
+//            servoFOT.setPosition(0.70);
 //            sleep(200);
-//            drive.followTrajectorySequence(backwardM);
+//            drive.followTrajectorySequence(park);
+
+            //Viper Slides Down
 //            motorSlideRight.setTargetPosition(1000);
 //            motorSlideLeft.setTargetPosition(1000);
 //            motorSlideRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);

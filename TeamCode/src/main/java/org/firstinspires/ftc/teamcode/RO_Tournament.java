@@ -12,10 +12,9 @@ import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 @TeleOp(group = "FINALCODE")
-public class FO_Meet3 extends OpMode {
+public class RO_Tournament extends OpMode {
 
     //Center Odometery Wheel in Motor Port 0 (motor1 encoder)
     //Right Odometery Wheel in Motor Port 1 (motor2 encoder)
@@ -26,17 +25,16 @@ public class FO_Meet3 extends OpMode {
     DcMotor motorBackLeft;
     DcMotor motorFrontLeft;
     DcMotor motorIntake;
+    DcMotor motorLauncher;
     DcMotorEx motorSlideLeft;
     DcMotorEx motorSlideRight;
     DcMotor temp;
 
-    Servo servoLauncher;
+    Servo servoClamp;
     Servo servoHOT;
     Servo servoFOT;
     Servo servoTOT;
     Servo servoBOT;
-    IMU imu;
-//    CRServo servoInt;
 
     double y;
     double x;
@@ -59,14 +57,9 @@ public class FO_Meet3 extends OpMode {
         DownCheck,
         RotateDown,
     }
-
     public enum HookState {
         In,
         Out,
-    }
-    public enum LaunchState {
-        Close,
-        Open,
     }
     public enum RigState {
         Bottom,
@@ -75,12 +68,9 @@ public class FO_Meet3 extends OpMode {
     }
     ElapsedTime liftTimer = new ElapsedTime();
     ElapsedTime hookTimer = new ElapsedTime();
-    ElapsedTime launchTimer = new ElapsedTime();
     ElapsedTime rigTimer = new ElapsedTime();
     ArmState armState = ArmState.Bottom;
     HookState hState = HookState.Out;
-    LaunchState lState = LaunchState.Close;
-
     RigState rState = RigState.Bottom;
 
     public void init() {
@@ -88,11 +78,12 @@ public class FO_Meet3 extends OpMode {
         motorFrontRight = hardwareMap.dcMotor.get("motor7");
         motorBackLeft = hardwareMap.dcMotor.get("motor2");
         motorFrontLeft = hardwareMap.dcMotor.get("motor3");
-        motorIntake = hardwareMap.dcMotor.get("motor4");
+        motorIntake = hardwareMap.dcMotor.get("motor5");
+        motorLauncher = hardwareMap.dcMotor.get("motor4");
+        temp = hardwareMap.dcMotor.get("motor7");
         motorSlideLeft = hardwareMap.get(DcMotorEx.class, "motor1");
         motorSlideRight = hardwareMap.get(DcMotorEx.class, "motor6");
-        temp = hardwareMap.dcMotor.get("motor7");
-        servoLauncher = hardwareMap.servo.get("servo1");
+        servoClamp = hardwareMap.servo.get("servo1");
         servoHOT = hardwareMap.servo.get("servo5"); //Hook ot
         servoFOT = hardwareMap.servo.get("servo4"); // flap ot
         servoTOT = hardwareMap.servo.get("servo2"); // top ot
@@ -114,47 +105,18 @@ public class FO_Meet3 extends OpMode {
         motorBackLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         motorFrontRight.setDirection(DcMotorSimple.Direction.REVERSE);
         motorBackRight.setDirection(DcMotorSimple.Direction.REVERSE);
-        imu = hardwareMap.get(IMU.class, "imu");
-        // Adjust the orientation parameters to match your robot
-        IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
-                RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
-                RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD));
-        // Without this, the REV Hub's orientation is assumed to be logo up / USB forward
-        imu.initialize(parameters);
-
-//        servoROT.setDirection(Servo.Direction.REVERSE);
-
-//        servoTOT.setDirection(Servo.Direction.REVERSE);
-
         liftTimer.reset();
         hookTimer.reset();
-        launchTimer.reset();
-
-
-//        motorSlideRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-//        motorSlideLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-
-        /*
-         Reverse the right side motors
-         Reverse left motors if you are using NeveRests
-         motorFrontRight.setDirection(DcMotorSimple.Direction.REVERSE);
-         motorBackRight.setDirection(DcMotorSimple.Direction.REVERSE);
-        */
     }
 
     public void start() {
-        servoLauncher.setPosition(0.235);
+        servoClamp.setPosition(0.5);
         motorSlideLeft.setTargetPosition(78);
         motorSlideRight.setTargetPosition(78);
         servoTOT.setPosition(0.83);
         servoBOT.setPosition(0.23);
         servoFOT.setPosition(0.57);
         servoHOT.setPosition(0.52);
-        imu.resetYaw();
-
-
-//        servoBOT.setPosition(1);
-
     }
 
     public void loop() {
@@ -238,31 +200,6 @@ public class FO_Meet3 extends OpMode {
 //                hState = HookState.Out;
         }
         telemetry.addData("hState:", hState);
-
-        switch (lState) {
-            case Close:
-                if (launchTimer.milliseconds() > 300) {
-                    if (gamepad2.back) {
-                        servoLauncher.setPosition(0.65);
-                        launchTimer.reset();
-                        lState = LaunchState.Open;
-                    }
-                    break;
-                }
-            case Open:
-                if (launchTimer.milliseconds() > 300) {
-                    if (gamepad2.back) {
-                        servoLauncher.setPosition(0.235);
-                        launchTimer.reset();
-                        lState = LaunchState.Close;
-                    }
-                    break;
-                }
-//            default:
-//                // should never be reached, as armState should never be null
-//                lState = LaunchState.Close;
-        }
-        telemetry.addData("LaunchState:", lState);
 
 
         switch (armState) {
@@ -368,48 +305,36 @@ public class FO_Meet3 extends OpMode {
 
 
 
-        if (gamepad1.right_trigger > 0) {
-            y = -gamepad1.left_stick_y; // Remember, this is reversed!
-            x = gamepad1.left_stick_x; // Counteract imperfect strafing
-            rx = -gamepad1.right_stick_x;
-        } else if (gamepad1.left_trigger > 0) {
-            y = -0.25 * gamepad1.left_stick_y; // Remember, this is reversed!
-            x = 0.25 * gamepad1.left_stick_x; // Counteract imperfect strafing
-            rx = -0.35 * gamepad1.right_stick_x;
-        } else {
-            y = -0.5 * gamepad1.left_stick_y; // Remember, this is reversed!
-            x = 0.5 * gamepad1.left_stick_x * 1.1; // Counteract imperfect strafing
-            rx = -0.65 * gamepad1.right_stick_x;
-        }
-
-        if (gamepad1.back) {
-            imu.resetYaw();
-        }
-
-            // This button choice was made so that it is hard to hit on accident,
-            // it can be freely changed based on preference.
-            // The equivalent button is start on Xbox-style controllers.
-
-
-            double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
-
-            // Rotate the movement direction counter to the bot's rotation
-            double rotX = x * Math.cos(-botHeading) - y * Math.sin(-botHeading);
-            double rotY = x * Math.sin(-botHeading) + y * Math.cos(-botHeading);
-
-            rotX = rotX * 1.1;  // Counteract imperfect strafing
-
             // Denominator is the largest motor power (absolute value) or 1
-            // This ensures all the powers maintain the same ratio,
-            // but only if at least one is out of the range [-1, 1]
-            double denominator = Math.max(Math.abs(rotY) + Math.abs(rotX) + Math.abs(rx), 1);
-            double frontLeftPower = (rotY + rotX + rx) / denominator;
-            double backLeftPower = (rotY - rotX + rx) / denominator;
-            double frontRightPower = (rotY - rotX - rx) / denominator;
-            double backRightPower = (rotY + rotX - rx) / denominator;
+            // This ensures all the powers maintain the same ratio, but only when
+            // at least one is out of the range [-1, 1]
+            // servo2.setDirection(Servo.Direction.REVERSE);
+            if (gamepad1.right_trigger > 0) {
+                y = -gamepad1.left_stick_y; // Remember, this is reversed!
+                x = gamepad1.left_stick_x; // Counteract imperfect strafing
+                rx = gamepad1.right_stick_x;
+            } else if (gamepad1.left_trigger > 0) {
+                y = 0.25 * -gamepad1.left_stick_y; // Remember, this is reversed!
+                x = 0.25 * gamepad1.left_stick_x; // Counteract imperfect strafing
+                rx = 0.35 * gamepad1.right_stick_x;
+            } else {
+                y = -0.5 * gamepad1.left_stick_y; // Remember, this is reversed!
+                x = 0.5 * gamepad1.left_stick_x * 1.1; // Counteract imperfect strafing
+                rx = 0.65 * gamepad1.right_stick_x;
+            }
 
-            motorFrontLeft.setPower(frontLeftPower);
-            motorBackLeft.setPower(backLeftPower);
+            /*
+             Denominator is the largest motor power (absolute value) or 1
+             This ensures all the powers maintain the same ratio, but only when
+             at least one is out of the range [-1, 1]
+            */
+            double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
+            double frontLeftPower = (y + x + rx) / denominator;
+            double backLeftPower = (y - x + rx) / denominator;
+            double frontRightPower = (y - x - rx) / denominator;
+            double backRightPower = (y + x - rx) / denominator;
+            motorFrontLeft.setPower(-frontLeftPower);
+            motorBackLeft.setPower(-backLeftPower);
             motorFrontRight.setPower(frontRightPower);
             motorBackRight.setPower(backRightPower);
 
@@ -488,6 +413,10 @@ public class FO_Meet3 extends OpMode {
                 motorIntake.setPower(0);
             }
 
-
+            if (gamepad2.back) {
+                motorLauncher.setPower(0.95);
+            } else {
+                motorLauncher.setPower(0);
+            }
     }
 }
