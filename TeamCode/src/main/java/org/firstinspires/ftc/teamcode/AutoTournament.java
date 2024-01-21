@@ -46,6 +46,15 @@ public class AutoTournament extends LinearOpMode {
         Servo servoBOT = hardwareMap.servo.get("servo3"); // bottom ot
         huskyLens = hardwareMap.get(HuskyLens.class, "huskylens");
 
+        waitForStart();
+        servoClamp.setPosition(0.6);
+        motorSlideLeft.setTargetPosition(0);
+        motorSlideRight.setTargetPosition(0);
+        servoTOT.setPosition(0.83);
+        servoBOT.setPosition(0.23);
+        servoFOT.setPosition(0.08);
+        servoHOT.setPosition(0.67);
+
         //Middle Movement
         Action startM =
                 drive.actionBuilder(startPose)
@@ -54,19 +63,15 @@ public class AutoTournament extends LinearOpMode {
         startPose = new Pose2d(25, 28, 180);
         Action toBoardM =
                 drive.actionBuilder(startPose)
-                        .strafeTo(new Vector2d(10,2))
-//                        .lineToY(7)
-//                        .lineToX(20)
-//                        .turnTo(90)
-//                        .lineToY(-2)
+                        .strafeTo(new Vector2d(25,50))
+                        .turnTo(90)
                         .build();
 
 
         //Right Movement
         Action startR =
                 drive.actionBuilder(startPose)
-                        .lineToX(10)
-                        .lineToY(10)
+                        .strafeTo(new Vector2d(31,15))
                         .build();
         Action toBoardR =
                 drive.actionBuilder(startPose)
@@ -80,9 +85,8 @@ public class AutoTournament extends LinearOpMode {
         //Left Movement
         Action startL =
                 drive.actionBuilder(startPose)
-                        .strafeTo(new Vector2d(26,22))
+                        .strafeTo(new Vector2d(13,26))
                         .build();
-        startPose = new Pose2d(15, 5, 180);
         Action toBoardL =
                 drive.actionBuilder(startPose)
                         .lineToY(5)
@@ -148,14 +152,7 @@ public class AutoTournament extends LinearOpMode {
         huskyLens.selectAlgorithm(HuskyLens.Algorithm.COLOR_RECOGNITION);
 
 
-        waitForStart();
-        servoClamp.setPosition(0.6);
-        motorSlideLeft.setTargetPosition(0);
-        motorSlideRight.setTargetPosition(0);
-        servoTOT.setPosition(0.83);
-        servoBOT.setPosition(0.23);
-        servoFOT.setPosition(0.08);
-        servoHOT.setPosition(0.67);
+
         long start = System.currentTimeMillis();
         long end = start + 2000;
         huskyLens.selectAlgorithm(HuskyLens.Algorithm.COLOR_RECOGNITION);
@@ -196,8 +193,8 @@ public class AutoTournament extends LinearOpMode {
         if (location == 2) {
             Actions.runBlocking(startM);
             servoClamp.setPosition(0.15);
-            sleep(20000);
-//            Actions.runBlocking(toBoardM);
+            sleep(2000);
+            Actions.runBlocking(toBoardM);
 
             //Viper Slides Up
 //            motorSlideRight.setTargetPosition(1000);
@@ -244,13 +241,11 @@ public class AutoTournament extends LinearOpMode {
 //            motorSlideRight.setVelocity(1000);
 //            motorSlideLeft.setVelocity(1000);
 //            sleep(1000);
-//        }
-//        else if (location == 1) {
-//            drive.followTrajectorySequence(startR);
-//            motorIntake.setPower(-0.45);
-//            drive.followTrajectorySequence(backR);
-//            motorIntake.setPower(0);
-//            drive.followTrajectorySequence(moveR);
+        } else if (location == 1) {
+            Actions.runBlocking(startR);
+            servoClamp.setPosition(0.15);
+            sleep(20000);
+//            Actions.runBlocking(toBoardR);
 //
 //            //END PART DO NOT CHANGE
 //            motorSlideRight.setTargetPosition(1000);
@@ -293,12 +288,11 @@ public class AutoTournament extends LinearOpMode {
 //            motorSlideRight.setVelocity(1000);
 //            motorSlideLeft.setVelocity(1000);
 //            sleep(1000);
-//        } else if (location == 3) {
-//            drive.followTrajectorySequence(startL);
-////                motorIntake.setPower(-0.45);
-//            drive.followTrajectorySequence(backL);
-////                motorIntake.setPower(0);
-//            drive.followTrajectorySequence(moveL);
+        } else if (location == 3) {
+            Actions.runBlocking(startL);
+            servoClamp.setPosition(0.15);
+            sleep(20000);
+//            Actions.runBlocking(toBoardL);
 //
 //            //END PART DO NOT CHANGE
 //            motorSlideRight.setTargetPosition(1000);
